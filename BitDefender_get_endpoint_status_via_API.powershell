@@ -1,0 +1,127 @@
+## Functions
+
+function GetSubGroups {
+  param (
+    [string]$GroupId = ''
+  )
+  #Write-Host "Working on Group: $GroupId"
+  $results = @($GroupId)
+  $groups = Get-CustomGroupList -GroupId $GroupId 
+  #Write-Host " Child Groups: $($groups -join ", ")"
+  if($groups.count -ge 1){
+    $groups | % {GetSubGroups -GroupId $_ | % {$results += $_}}
+    #Write-Host "Results: $($results -join ", ")"
+  }
+  return $results
+}
+
+function Get-CustomGroupList {
+  param(
+    [string]$GroupId = $null
+  )
+  
+  if ($groupId){
+    $payload = @{
+      id      = 1;
+      jsonrpc = "2.0";
+      method  = "getCustomGroupsList";
+      params = @{
+        parentId = "$GroupId";
+      }
+    } | ConvertTo-Json
+  }
+  else{
+    $payload = @{
+      id      = 1;
+      jsonrpc = "2.0";
+      method  = "getCustomGroupsList"; 
+    } | ConvertTo-Json
+  }
+
+  $response = Invoke-RestMethod `
+    -Uri $apiUrl `
+    -Method Post `
+    -Headers $headers `
+    -Body $payload `
+    -ErrorAction Stop `
+    -ContentType "application/json"
+  return $response.result.id
+}
+
+function Get-EndpointsList {
+  param(
+    [string]$ParentId
+  )
+
+  $payload = @{
+    id      = 1;
+    jsonrpc = "2.0";
+    method  = "getEndpointsList"; 
+    params  = @{
+      parentId = "$ParentId";
+    }
+  } | ConvertTo-Json
+
+  $response = Invoke-RestMethod `
+    -Uri $apiUrl `
+    -Method Post `
+    -Headers $headers `
+    -Body $payload `
+    -ErrorAction Stop `
+    -ContentType "application/json"
+
+   return $response.result.items
+}
+
+function Get-ManagedEndpointDetails {
+  param(
+    [string]$EndpointId
+  )
+  $payload = @{
+    id      = 1;
+    jsonrpc = "2.0";
+    method  = "getManagedEndpointDetails"; 
+    params  = @{
+      endpointId = "$EndpointId";
+    }
+  } | ConvertTo-Json
+  
+  $response = Invoke-RestMethod `
+    -Uri $apiUrl `
+    -Method Post `
+    -Headers $headers `
+    -Body $payload `
+    -ErrorAction Stop `
+    -ContentType "application/json"
+  return $response.result
+}
+#Code
+
+$apiUrl = "https://cloud.gravityzone.bitdefender.com/api/v1.0/jsonrpc/network"
+$apiKey = "Tmsfxc1KbvrhWknxNKotusgz8WIPonKX"
+$apiKey = $apiKey + ":"
+$Base64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($apiKey))
+
+$headers = @{
+  'Authorization' = "Basic $Base64"
+}
+
+#Get List of Groups
+$groups = @()
+$topLevelGroups = Get-CustomGroupList
+Write-Host "Processing Top Level Groups"
+$topLevelGroups | % {GetSubGroups -GroupId $_ | % {$groups += $_}}
+
+#Get List of endpoints in each group
+$computers = @()
+foreach ($group in $groups){
+  $endpoints = Get-EndpointsList -ParentId $group
+
+  #Get Detailed Information about each endpoint
+  foreach ($c in $endpoints) {
+    Write-Host "Working on Computer: $($c.name)"
+    $computers += Get-ManagedEndpointDetails -EndpointId $c.id
+  }
+}
+
+$computers | Select-Object Name, OperatingSystem, Label, MalwareStatus, Group | format-table -Property *
