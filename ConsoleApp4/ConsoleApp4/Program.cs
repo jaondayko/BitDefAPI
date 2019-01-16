@@ -10,27 +10,8 @@ namespace ConsoleApp4
 {
     class Program
     {
-        static void Main(string[] args)
+        public static Client ApiPass()
         {
-
-            JToken parameters = new JObject();
-            parameters["page"] = 1;
-            parameters["perPage"] = 2;
-
-            Client passer = ApiPass();
-
-            Request request = passer.NewRequest("getEndpointsList", parameters);
-
-            Response response = passer.Rpc(request);
-            Console.WriteLine(response.ToString());
-
-            Console.Write("Testing Line");
-
-            Console.ReadKey();
-
-        }
-
-        public static Client ApiPass() {            
             String apiURL = "https://cloud.gravityzone.bitdefender.com/api/v1.0/jsonrpc/network";
             Client rpcClient = new Client(apiURL);
             String auth = AuthMethod();
@@ -47,9 +28,8 @@ namespace ConsoleApp4
         }
 
         //GetCustomGroupLists needed
-        public int GetCustomGroupList()
+        public static int GetCustomGroupList(string groupID)
         {
-            string groupID = null;
             if (String.IsNullOrEmpty(groupID))
             {
                 JToken parameters = new JObject();
@@ -57,7 +37,7 @@ namespace ConsoleApp4
                 Client test = ApiPass();
                 Request request = test.NewRequest("getEndpointsList", parameters);
                 Response testResponse = test.Rpc(request);
-
+                Console.WriteLine(testResponse.ToString());
                 return testResponse.Id;
             }
             else
@@ -68,35 +48,86 @@ namespace ConsoleApp4
                 Client test = ApiPass();
                 Request request = test.NewRequest("getEndpointsList", parameters);
                 Response testResponse = test.Rpc(request);
-
+                Console.WriteLine(testResponse.ToString());
                 return testResponse.Id;
             }
         }
 
         //This is the recursion boi
-        public String GetSubGroups(String groupID)
+        public void GetSubGroups(String groupID)
         {
 
             List<String> results = new List<String>();
+            List<String> groups = new List<String>(GetCustomGroupList(groupID));
+            List<String> group = new List<string>();
 
-            return "test";
+            if (groups.Count >= 1)
+            {
+                for (var i = 0; i < groups.Count; i++)
+                {
+                    List<String> td = new List<String>();
+                    results.Add(td.ToString());
+                }
+            }
 
         }
 
         //Only void for testing
-        public void GetEndpointList(String parentID)
+        public String GetEndpointList(String parentID)
         {
             JToken parameters = new JObject();
-
+            Client test = ApiPass();
+            Request requester = test.NewRequest("getEndpointsList", parameters);
+            Response testResponse = test.Rpc(requester);
+            Console.WriteLine(testResponse.ToString());
+            return testResponse.ToString();
 
         }
 
         //Only void for testing
-        public void GetManagedEndpointDetails()
+        public static String GetManagedEndpointDetails(String EndpointId)
         {
-
+            JToken parameters = new JObject();
+            parameters["endpointId"] = EndpointId;
+            Client test = ApiPass();
+            Request requester = test.NewRequest("getManagedEndpointDetails", parameters);
+            Response testResponse = test.Rpc(requester);
+            return testResponse.ToString();
         }
 
+
+        static void Main(string[] args)
+        {
+
+            JToken parameters = new JObject();
+            parameters["page"] = 1;
+            parameters["perPage"] = 2;
+
+            Client passer = ApiPass();
+
+            Request request = passer.NewRequest("getEndpointsList", parameters);
+
+            Response response = passer.Rpc(request);
+            Console.WriteLine(response.ToString());
+
+            Console.Write("Testing Line");
+
+            List<String> computers = new List<String>();
+            List<String> groups = new List<String>();
+
+
+            String groupID = null;
+            String endpointID = "1";
+            int topLevelGroups = GetCustomGroupList(groupID);
+            Console.WriteLine("Top Level Groups");
+            Console.WriteLine(GetManagedEndpointDetails(endpointID));
+            
+            Console.WriteLine("Hello");
+
+
+
+            Console.ReadKey();
+        }
 
     }
 }
