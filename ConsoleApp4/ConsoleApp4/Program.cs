@@ -10,6 +10,7 @@ namespace ConsoleApp4
 {
     class Program
     {
+        //Runs through for the client to use the API headers
         public static Client ApiPass()
         {
             String apiURL = "https://cloud.gravityzone.bitdefender.com/api/v1.0/jsonrpc/network";
@@ -19,6 +20,7 @@ namespace ConsoleApp4
             return rpcClient;
         }
 
+        //Uses an API Key to pass to ApiPass
         public static String AuthMethod()
         {
             String apiKey = "2sBqp0JghAhJFLrcPjK5P+OjGP+pkWIP";
@@ -27,7 +29,7 @@ namespace ConsoleApp4
             return authHeader;
         }
 
-        //GetCustomGroupLists needed
+        //Gets the custom group lists using a GroupID.
         public static int GetCustomGroupList(string groupID)
         {
             if (String.IsNullOrEmpty(groupID))
@@ -53,22 +55,23 @@ namespace ConsoleApp4
             }
         }
 
-        //This is the recursion boi
-        public void GetSubGroups(String groupID)
+        //Recursive boi RIP
+        public static List<String> GetSubGroups(String groupID)
         {
 
             List<String> results = new List<String>();
             List<String> groups = new List<String>(GetCustomGroupList(groupID));
-            List<String> group = new List<string>();
+            String group = null;
 
             if (groups.Count >= 1)
             {
                 for (var i = 0; i < groups.Count; i++)
                 {
-                    List<String> td = new List<String>();
+                    List<String> td = new List<String>(GetSubGroups(group));
                     results.Add(td.ToString());
                 }
             }
+            return results;
 
         }
 
@@ -84,7 +87,7 @@ namespace ConsoleApp4
 
         }
 
-        //Only void for testing
+        //Get the details for a specific Endpoint ID.
         public static String GetManagedEndpointDetails(String EndpointId)
         {
             JToken parameters = new JObject();
@@ -117,14 +120,15 @@ namespace ConsoleApp4
 
 
             String groupID = null;
-            String endpointID = "1";
+            String endpointID = "5c3c937429631119cfd4ff93"; //Example ID: 5c3c937429631119cfd4ff93
             int topLevelGroups = GetCustomGroupList(groupID);
             Console.WriteLine("Top Level Groups");
-            Console.WriteLine(GetManagedEndpointDetails(endpointID));
+            String hold = GetManagedEndpointDetails(endpointID);
+            Console.WriteLine(hold);
             
             Console.WriteLine("Hello");
 
-
+            GetSubGroups(groupID);
 
             Console.ReadKey();
         }
