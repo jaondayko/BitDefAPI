@@ -10,6 +10,8 @@ namespace ConsoleApp4
 {
     class Program
     {
+        private object td;
+
         //Runs through for the client to use the API headers
         public static Client ApiPass()
         {
@@ -23,24 +25,26 @@ namespace ConsoleApp4
         //Uses an API Key to pass to ApiPass
         public static String AuthMethod()
         {
-            String apiKey = "2sBqp0JghAhJFLrcPjK5P+OjGP+pkWIP";
+            String apiKey = "0/Bw0vslK+JdScZgt0LRWhIhkB8Yr8LR";
             String userPassString = apiKey + ":";
             String authHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes(userPassString));
             return authHeader;
         }
 
         //Gets the custom group lists using a GroupID.
-        public static int GetCustomGroupList(string groupID)
+        public static String GetCustomGroupList(string groupID)
         {
             if (String.IsNullOrEmpty(groupID))
             {
-                JToken parameters = new JObject();
-
+                JToken parameters = new JObject();   
                 Client test = ApiPass();
-                Request request = test.NewRequest("getEndpointsList", parameters);
-                Response testResponse = test.Rpc(request);
+                Request request = test.NewRequest("getCustomGroupsList", parameters);
+                GenericResponse testResponse = test.Rpc(request);
+                Console.WriteLine("fuck we are here");
                 Console.WriteLine(testResponse.ToString());
-                return testResponse.Id;
+                JToken results = testResponse.Result;
+                
+                return testResponse.Id.ToString();
             }
             else
             {
@@ -48,10 +52,10 @@ namespace ConsoleApp4
                 parameters["parentId"] = JToken.Parse(groupID);
 
                 Client test = ApiPass();
-                Request request = test.NewRequest("getEndpointsList", parameters);
+                Request request = test.NewRequest("getCustomGroupsList", parameters);
                 Response testResponse = test.Rpc(request);
                 Console.WriteLine(testResponse.ToString());
-                return testResponse.Id;
+                return testResponse.Id.ToString();
             }
         }
 
@@ -60,29 +64,32 @@ namespace ConsoleApp4
         {
 
             List<String> results = new List<String>();
-            List<String> groups = new List<String>(GetCustomGroupList(groupID));
-            String group = null;
+            List<String> groups = new List<String>();
+            groups.Add(GetCustomGroupList(groupID));
+            results.Add(groupID);
 
-            if (groups.Count >= 1)
+            if(groups.Count >= 1)
             {
-                for (var i = 0; i < groups.Count; i++)
+                foreach(var group in groups)
                 {
-                    List<String> td = new List<String>(GetSubGroups(group));
-                    results.Add(td.ToString());
+                    var td = GetSubGroups(group);
+                    foreach(var t in td)
+                    {
+                        results.Add(t);
+                    }
                 }
-            }
+            }    
             return results;
 
         }
 
         //Only void for testing
-        public String GetEndpointList(String parentID)
+        public static String GetEndpointList(String parentID)
         {
             JToken parameters = new JObject();
             Client test = ApiPass();
             Request requester = test.NewRequest("getEndpointsList", parameters);
             Response testResponse = test.Rpc(requester);
-            Console.WriteLine(testResponse.ToString());
             return testResponse.ToString();
 
         }
@@ -98,38 +105,39 @@ namespace ConsoleApp4
             return testResponse.ToString();
         }
 
-
         static void Main(string[] args)
         {
-
-            JToken parameters = new JObject();
-            parameters["page"] = 1;
-            parameters["perPage"] = 2;
-
-            Client passer = ApiPass();
-
-            Request request = passer.NewRequest("getEndpointsList", parameters);
-
-            Response response = passer.Rpc(request);
-            Console.WriteLine(response.ToString());
-
-            Console.Write("Testing Line");
+            Console.WriteLine("Start");
 
             List<String> computers = new List<String>();
             List<String> groups = new List<String>();
-
-
-            String groupID = null;
-            String endpointID = "5c3c937429631119cfd4ff93"; //Example ID: 5c3c937429631119cfd4ff93
-            int topLevelGroups = GetCustomGroupList(groupID);
+            //Example ID: 5c3c937429631119cfd4ff93
+            List<String> topLevelGroups = new List<String>();
+            topLevelGroups.Add(GetCustomGroupList(null));
             Console.WriteLine("Top Level Groups");
-            String hold = GetManagedEndpointDetails(endpointID);
-            Console.WriteLine(hold);
+            foreach(String group in topLevelGroups)
+            {
+                Console.WriteLine("We are inside the ForEach");
+                List<string> td = GetSubGroups(group);
+                foreach(var t in td)
+                {
+                    groups.Add(t);
+                }
+            }
             
-            Console.WriteLine("Hello");
+            Console.WriteLine("Get Endpoints List Finished");
 
-            GetSubGroups(groupID);
-
+            foreach(var group in groups)
+            {
+                List<String> endpoints = new List<String>();
+                endpoints.Add(GetEndpointList(group));
+                foreach(var c in endpoints)
+                {
+                    Console.WriteLine("Working on Computer: " + c);
+                    computers.Add(GetManagedEndpointDetails(c));
+                }
+            }
+            Console.WriteLine("Overall Program Done!");
             Console.ReadKey();
         }
 

@@ -12,7 +12,6 @@ C:\Users\JoshOndayko\source\repos\ConsoleApp4\ConsoleApp4\bin\Debug\Newtonsoft.J
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\bin\Debug\ConsoleApp4.exe
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\bin\Debug\ConsoleApp4.pdb
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\bin\Debug\Newtonsoft.Json.dll
-C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\bin\Debug\JsonRPC.pdb
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\obj\Debug\ConsoleApp4.csprojAssemblyReference.cache
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\obj\Debug\ConsoleApp4.csproj.CoreCompileInputs.cache
 C:\Users\JoshOndayko\source\repos\ConsoleApp4\jaondayko\BitDefAPI\ConsoleApp4\ConsoleApp4\obj\Debug\ConsoleApp4.csproj.CopyComplete
