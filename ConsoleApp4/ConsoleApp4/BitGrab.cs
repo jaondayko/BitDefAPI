@@ -253,7 +253,7 @@ namespace ConsoleApp4
         //Uses an API Key to pass to ApiPass to connect properly
         public static String AuthMethod()
         {
-            String apiKey = "0/Bw0vslK+JdScZgt0LRWhIhkB8Yr8LR";
+            String apiKey = "XXXXXXXXX"; //Insert API Key here
             String userPassString = apiKey + ":";
             String authHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes(userPassString));
             return authHeader;
