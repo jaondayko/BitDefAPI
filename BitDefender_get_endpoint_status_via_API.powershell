@@ -98,7 +98,7 @@ function Get-ManagedEndpointDetails {
 #Code
 
 $apiUrl = "https://cloud.gravityzone.bitdefender.com/api/v1.0/jsonrpc/network"
-$apiKey = "Tmsfxc1KbvrhWknxNKotusgz8WIPonKX"
+$apiKey = "XXXXXXXXX" #Insert API Key Here
 $apiKey = $apiKey + ":"
 $Base64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($apiKey))
 
